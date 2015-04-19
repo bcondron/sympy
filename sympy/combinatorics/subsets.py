@@ -4,7 +4,7 @@ from itertools import combinations
 
 from sympy.core import Basic
 from sympy.combinatorics.graycode import GrayCode
-from sympy.core.compatibility import xrange
+from sympy.core.compatibility import range
 
 
 class Subset(Basic):
@@ -466,7 +466,7 @@ class Subset(Basic):
         if len(super_set) != len(bitlist):
             raise ValueError("The sizes of the lists are not equal")
         ret_set = []
-        for i in xrange(len(bitlist)):
+        for i in range(len(bitlist)):
             if bitlist[i] == '1':
                 ret_set.append(super_set[i])
         return Subset(ret_set, super_set)
@@ -539,7 +539,8 @@ class Subset(Basic):
         """Return indices of subset in superset in a list; the list is empty
         if all elements of subset are not in superset.
 
-        Examples::
+        Examples
+        ========
 
             >>> from sympy.combinatorics import Subset
             >>> superset = [1, 3, 2, 5, 4]

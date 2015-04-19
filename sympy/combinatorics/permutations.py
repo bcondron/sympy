@@ -4,12 +4,12 @@ import random
 from collections import defaultdict
 
 from sympy.core import Basic
-from sympy.core.compatibility import is_sequence, reduce, xrange
+from sympy.core.compatibility import is_sequence, reduce, range
 from sympy.utilities.iterables import (flatten, has_variety, minlex,
     has_dups, runs)
 from sympy.polys.polytools import lcm
 from sympy.matrices import zeros
-from sympy.mpmath.libmp.libintmath import ifac
+from mpmath.libmp.libintmath import ifac
 
 
 def _af_rmul(a, b):
@@ -31,7 +31,8 @@ def _af_rmul(a, b):
 
     This handles the operands in reverse order compared to the ``*`` operator:
 
-    >>> a = Permutation(a); b = Permutation(b)
+    >>> a = Permutation(a)
+    >>> b = Permutation(b)
     >>> list(a*b)
     [2, 0, 1]
     >>> [b(a(i)) for i in range(3)]
@@ -117,9 +118,9 @@ def _af_parity(pi):
     ========
 
     >>> from sympy.combinatorics.permutations import _af_parity
-    >>> _af_parity([0,1,2,3])
+    >>> _af_parity([0, 1, 2, 3])
     0
-    >>> _af_parity([3,2,0,1])
+    >>> _af_parity([3, 2, 0, 1])
     1
 
     See Also
@@ -174,7 +175,7 @@ def _af_pow(a, n):
 
     >>> from sympy.combinatorics.permutations import Permutation, _af_pow
     >>> Permutation.print_cyclic = False
-    >>> p = Permutation([2,0,3,1])
+    >>> p = Permutation([2, 0, 3, 1])
     >>> p.order()
     4
     >>> _af_pow(p._array_form, 4)
@@ -218,7 +219,7 @@ def _af_commutes_with(a, b):
     ========
 
     >>> from sympy.combinatorics.permutations import _af_commutes_with
-    >>> _af_commutes_with([1,2,0], [0,2,1])
+    >>> _af_commutes_with([1, 2, 0], [0, 2, 1])
     False
 
     See Also
@@ -247,7 +248,7 @@ class Cycle(dict):
 
     The identity cycle, Cycle(), can be used to start a product:
 
-    >>> Cycle()(1, 2)(2,3)
+    >>> Cycle()(1, 2)(2, 3)
     Cycle(1, 3, 2)
 
     The array form of a Cycle can be obtained by calling the list
@@ -264,7 +265,7 @@ class Cycle(dict):
     provide the desired size -- but the Cycle cannot be truncated to
     a size smaller than the largest element that is out of place:
 
-    >>> b = Cycle(2,4)(1,2)(3,1,4)(1,3)
+    >>> b = Cycle(2, 4)(1, 2)(3, 1, 4)(1, 3)
     >>> b.list()
     [0, 2, 1, 3, 4]
     >>> b.list(b.size + 1)
@@ -283,14 +284,14 @@ class Cycle(dict):
     The array form can be used to instantiate a Permutation so other
     properties of the permutation can be investigated:
 
-    >>> Perm(Cycle(1,2)(3,4).list()).transpositions()
+    >>> Perm(Cycle(1, 2)(3, 4).list()).transpositions()
     [(1, 2), (3, 4)]
 
     Notes
     =====
 
     The underlying structure of the Cycle is a dictionary and although
-    the __iter__ method has been redefiend to give the array form of the
+    the __iter__ method has been redefined to give the array form of the
     cycle, the underlying dictionary items are still available with the
     such methods as items():
 
@@ -316,6 +317,7 @@ class Cycle(dict):
 
         Examples
         ========
+
         >>> from sympy.combinatorics.permutations import Cycle as C
         >>> from sympy.combinatorics.permutations import Permutation as Perm
         >>> C(1, 2)(2, 3)
@@ -348,6 +350,7 @@ class Cycle(dict):
 
         Examples
         ========
+
         >>> from sympy.combinatorics.permutations import Cycle
         >>> from sympy.combinatorics.permutations import Permutation
         >>> Permutation.print_cyclic = False
@@ -400,6 +403,7 @@ class Cycle(dict):
 
         Examples
         ========
+
         >>> from sympy.combinatorics.permutations import Cycle
         >>> Cycle(1, 2, 6)
         Cycle(1, 2, 6)
@@ -434,7 +438,7 @@ class Permutation(Basic):
     A permutation, alternatively known as an 'arrangement number' or 'ordering'
     is an arrangement of the elements of an ordered list into a one-to-one
     mapping with itself. The permutation of a given arrangement is given by
-    indicating the positions of the elements after re-arrangment [2]_. For
+    indicating the positions of the elements after re-arrangement [2]_. For
     example, if one started with elements [x, y, a, b] (in that order) and
     they were reordered as [x, y, b, a] then the permutation would be
     [0, 1, 3, 2]. Notice that (in SymPy) the first element is always referred
@@ -687,7 +691,7 @@ class Permutation(Basic):
     same elements, but what that rank is depends on how the permutations are
     enumerated. (There are a number of different methods of doing so.) The
     lexicographic rank is given by the rank method and this rank is used to
-    increment a partion with addition/subtraction:
+    increment a permutation with addition/subtraction:
 
     >>> p.rank()
     6
@@ -935,12 +939,12 @@ class Permutation(Basic):
 
         >>> from sympy.combinatorics.permutations import Permutation
         >>> Permutation.print_cyclic = False
-        >>> p = Permutation([[2,0], [3,1]])
+        >>> p = Permutation([[2, 0], [3, 1]])
         >>> p.array_form
         [2, 3, 0, 1]
-        >>> Permutation([[2,0,3,1]]).array_form
+        >>> Permutation([[2, 0, 3, 1]]).array_form
         [3, 2, 0, 1]
-        >>> Permutation([2,0,3,1]).array_form
+        >>> Permutation([2, 0, 3, 1]).array_form
         [2, 0, 3, 1]
         >>> Permutation([[1, 2], [4, 5]]).array_form
         [0, 2, 1, 3, 5, 4]
@@ -955,6 +959,7 @@ class Permutation(Basic):
 
         Examples
         ========
+
         >>> from sympy.combinatorics.permutations import Permutation
         >>> Permutation.print_cyclic = False
         >>> p = Permutation(2, 3)(4, 5)
@@ -1257,11 +1262,11 @@ class Permutation(Basic):
         ========
 
         >>> from sympy.combinatorics.permutations import Permutation
-        >>> a = Permutation([1,4,3,0,2,5])
-        >>> b = Permutation([0,1,2,3,4,5])
+        >>> a = Permutation([1, 4, 3, 0, 2, 5])
+        >>> b = Permutation([0, 1, 2, 3, 4, 5])
         >>> a.commutes_with(b)
         True
-        >>> b = Permutation([2,3,5,4,1,0])
+        >>> b = Permutation([2, 3, 5, 4, 1, 0])
         >>> a.commutes_with(b)
         False
         """
@@ -1295,6 +1300,7 @@ class Permutation(Basic):
 
         Examples
         ========
+
         >>> from sympy.combinatorics import Permutation
         >>> p = Permutation(1, 2, 9)
         >>> 2^p == p(2) == 9
@@ -1330,7 +1336,7 @@ class Permutation(Basic):
 
         The expression q^p^r is equivalent to q^(p*r):
 
-        >>> r = Permutation(9)(4,6,8)
+        >>> r = Permutation(9)(4, 6, 8)
         >>> q^p^r == q^(p*r)
         True
 
@@ -1488,7 +1494,7 @@ class Permutation(Basic):
         ========
 
         >>> from sympy.combinatorics.permutations import Permutation
-        >>> p = Permutation([[2,0], [3,1]])
+        >>> p = Permutation([[2, 0], [3, 1]])
         >>> p.array_form
         [2, 3, 0, 1]
         >>> [p(i) for i in range(4)]
@@ -1513,7 +1519,7 @@ class Permutation(Basic):
                 try:
                     # P([a, b, c])
                     return [i[j] for j in self._array_form]
-                except:
+                except Exception:
                     raise TypeError('unrecognized argument')
         else:
             # P(1, 2, 3)
@@ -1619,7 +1625,7 @@ class Permutation(Basic):
         ========
 
         >>> from sympy.combinatorics.permutations import Permutation
-        >>> p = Permutation([0,1,2,3])
+        >>> p = Permutation([0, 1, 2, 3])
         >>> p.rank_nonlex()
         23
 
@@ -1718,7 +1724,7 @@ class Permutation(Basic):
         ========
 
         >>> from sympy.combinatorics.permutations import Permutation
-        >>> p = Permutation([0,1,2,3])
+        >>> p = Permutation([0, 1, 2, 3])
         >>> p.cardinality
         24
 
@@ -1741,10 +1747,10 @@ class Permutation(Basic):
         ========
 
         >>> from sympy.combinatorics.permutations import Permutation
-        >>> p = Permutation([0,1,2,3])
+        >>> p = Permutation([0, 1, 2, 3])
         >>> p.parity()
         0
-        >>> p = Permutation([3,2,0,1])
+        >>> p = Permutation([3, 2, 0, 1])
         >>> p.parity()
         1
 
@@ -1767,10 +1773,10 @@ class Permutation(Basic):
         ========
 
         >>> from sympy.combinatorics.permutations import Permutation
-        >>> p = Permutation([0,1,2,3])
+        >>> p = Permutation([0, 1, 2, 3])
         >>> p.is_even
         True
-        >>> p = Permutation([3,2,1,0])
+        >>> p = Permutation([3, 2, 1, 0])
         >>> p.is_even
         True
 
@@ -1790,10 +1796,10 @@ class Permutation(Basic):
         ========
 
         >>> from sympy.combinatorics.permutations import Permutation
-        >>> p = Permutation([0,1,2,3])
+        >>> p = Permutation([0, 1, 2, 3])
         >>> p.is_odd
         False
-        >>> p = Permutation([3,2,0,1])
+        >>> p = Permutation([3, 2, 0, 1])
         >>> p.is_odd
         True
 
@@ -1854,6 +1860,7 @@ class Permutation(Basic):
 
         Examples
         ========
+
         >>> from sympy.combinatorics.permutations import Permutation
         >>> p = Permutation([])
         >>> p.is_Identity
@@ -1874,7 +1881,7 @@ class Permutation(Basic):
         order
         """
         af = self.array_form
-        return not af or all(i == af[i] for i in xrange(self.size))
+        return not af or all(i == af[i] for i in range(self.size))
 
     def ascents(self):
         """
@@ -1885,7 +1892,7 @@ class Permutation(Basic):
         ========
 
         >>> from sympy.combinatorics.permutations import Permutation
-        >>> p = Permutation([4,0,1,3,2])
+        >>> p = Permutation([4, 0, 1, 3, 2])
         >>> p.ascents()
         [1, 2]
 
@@ -1907,7 +1914,7 @@ class Permutation(Basic):
         ========
 
         >>> from sympy.combinatorics.permutations import Permutation
-        >>> p = Permutation([4,0,1,3,2])
+        >>> p = Permutation([4, 0, 1, 3, 2])
         >>> p.descents()
         [0, 3]
 
@@ -1928,7 +1935,7 @@ class Permutation(Basic):
         ========
 
         >>> from sympy.combinatorics.permutations import Permutation
-        >>> p = Permutation([1,0,2,3,4])
+        >>> p = Permutation([1, 0, 2, 3, 4])
         >>> p.max()
         1
 
@@ -1952,7 +1959,7 @@ class Permutation(Basic):
         ========
 
         >>> from sympy.combinatorics.permutations import Permutation
-        >>> p = Permutation([0,1,4,3,2])
+        >>> p = Permutation([0, 1, 4, 3, 2])
         >>> p.min()
         2
 
@@ -1988,10 +1995,10 @@ class Permutation(Basic):
         ========
 
         >>> from sympy.combinatorics.permutations import Permutation
-        >>> p = Permutation([0,1,2,3,4,5])
+        >>> p = Permutation([0, 1, 2, 3, 4, 5])
         >>> p.inversions()
         0
-        >>> Permutation([3,2,1,0]).inversions()
+        >>> Permutation([3, 2, 1, 0]).inversions()
         6
 
         See Also
@@ -2083,7 +2090,7 @@ class Permutation(Basic):
         ========
 
         >>> from sympy.combinatorics.permutations import Permutation
-        >>> p = Permutation([0,1,2])
+        >>> p = Permutation([0, 1, 2])
         >>> p.inversions()
         0
         >>> p.signature()
@@ -2145,7 +2152,7 @@ class Permutation(Basic):
         See Also
         ========
 
-        min, max, suppport, cardinality, order, rank, size
+        min, max, support, cardinality, order, rank, size
         """
 
         return len(self.support())
@@ -2231,7 +2238,7 @@ class Permutation(Basic):
         ========
 
         >>> from sympy.combinatorics.permutations import Permutation
-        >>> p = Permutation([2,5,7,3,6,0,1,4,8])
+        >>> p = Permutation([2, 5, 7, 3, 6, 0, 1, 4, 8])
         >>> p.runs()
         [[2, 5, 7], [3, 6], [0, 1, 4, 8]]
         >>> q = Permutation([1,3,2,0])
@@ -2301,10 +2308,10 @@ class Permutation(Basic):
         ========
 
         >>> from sympy.combinatorics.permutations import Permutation
-        >>> p = Permutation([0,1,2,3])
+        >>> p = Permutation([0, 1, 2, 3])
         >>> p.rank_trotterjohnson()
         0
-        >>> p = Permutation([0,2,1,3])
+        >>> p = Permutation([0, 2, 1, 3])
         >>> p.rank_trotterjohnson()
         7
 
@@ -2433,7 +2440,7 @@ class Permutation(Basic):
         ========
 
         >>> from sympy.combinatorics.permutations import Permutation
-        >>> p = Permutation.josephus(3,6,1)
+        >>> p = Permutation.josephus(3, 6, 1)
         >>> p
         Permutation([2, 5, 3, 1, 4, 0])
         >>> p.get_precedence_matrix()
@@ -2462,7 +2469,7 @@ class Permutation(Basic):
         Computes the precedence distance between two permutations.
 
         Suppose p and p' represent n jobs. The precedence metric
-        counts the number of times a job j is prededed by job i
+        counts the number of times a job j is preceded by job i
         in both p and p'. This metric is commutative.
 
         Examples
@@ -2507,7 +2514,7 @@ class Permutation(Basic):
         ========
 
         >>> from sympy.combinatorics.permutations import Permutation
-        >>> p = Permutation.josephus(3,6,1)
+        >>> p = Permutation.josephus(3, 6, 1)
         >>> p.get_adjacency_matrix()
         Matrix([
         [0, 0, 0, 0, 0, 0],
@@ -2613,7 +2620,7 @@ class Permutation(Basic):
         were selected.
 
         The parameter ``s`` stops the selection process when there are ``s``
-        items remaining and these are selected by countinuing the selection,
+        items remaining and these are selected by continuing the selection,
         counting by 1 rather than by ``m``.
 
         Consider selecting every 3rd item from 6 until only 2 remain::
@@ -2686,7 +2693,7 @@ class Permutation(Basic):
         """
         Generates a random permutation of length ``n``.
 
-        Uses the underlying Python psuedo-random number generator.
+        Uses the underlying Python pseudo-random number generator.
 
         Examples
         ========

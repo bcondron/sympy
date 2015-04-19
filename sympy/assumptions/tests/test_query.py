@@ -17,7 +17,7 @@ from sympy.functions.elementary.exponential import (exp, log)
 from sympy.functions.elementary.miscellaneous import sqrt
 from sympy.functions.elementary.trigonometric import (
     acos, acot, asin, atan, cos, cot, sin, tan)
-from sympy.logic.boolalg import Equivalent, Implies, Xor, And, to_cnf, Not
+from sympy.logic.boolalg import Equivalent, Implies, Xor, And, to_cnf
 from sympy.utilities.pytest import raises, XFAIL, slow
 from sympy.assumptions.assume import assuming
 
@@ -1451,16 +1451,17 @@ def test_imaginary():
     assert ask(Q.imaginary(x**y), Q.imaginary(x) & Q.odd(y)) is True
     assert ask(Q.imaginary(x**y), Q.imaginary(x) & Q.rational(y)) is None
     assert ask(Q.imaginary(x**y), Q.imaginary(x) & Q.even(y)) is False
+
     assert ask(Q.imaginary(x**y), Q.real(x) & Q.integer(y)) is False
     assert ask(Q.imaginary(x**y), Q.positive(x) & Q.real(y)) is False
-    assert ask(Q.imaginary(x**y), Q.negative(x) & Q.real(y)) is True
+    assert ask(Q.imaginary(x**y), Q.negative(x) & Q.real(y)) is None
+    assert ask(Q.imaginary(x**y), Q.negative(x) & Q.real(y) & ~Q.rational(y)) is False
     assert ask(Q.imaginary(x**y), Q.integer(x) & Q.imaginary(y)) is None
-    assert ask(Q.imaginary(x**(y/z)), Q.negative(x) & Q.integer(y) & Q.even(z)) is True
-    assert ask(Q.imaginary(x**(y/z)), Q.real(x) & Q.real(y/z) & Q.rational(y/z) & Q.even(z) & Q.negative(x)) is True
-    assert ask(Q.imaginary(x**(y/z)), Q.real(x) & Q.rational(y/z) & Q.even(z) & Q.negative(x)) is True
-    assert ask(Q.imaginary(x**(y/z)), Q.real(x) & Q.integer(y/z)) is False
-    assert ask(Q.imaginary(x**(y/z)), Q.real(x) & Q.real(y/z) & Q.positive(x)) is False
-    assert ask(Q.imaginary(x**(y/z)), Q.real(x) & Q.real(y/z) & Q.negative(x)) is True
+    assert ask(Q.imaginary(x**y), Q.negative(x) & Q.rational(y) & Q.integer(2*y)) is True
+    assert ask(Q.imaginary(x**y), Q.negative(x) & Q.rational(y) & ~Q.integer(2*y)) is False
+    assert ask(Q.imaginary(x**y), Q.negative(x) & Q.rational(y)) is None
+    assert ask(Q.imaginary(x**y), Q.real(x) & Q.rational(y) & ~Q.integer(2*y)) is False
+    assert ask(Q.imaginary(x**y), Q.real(x) & Q.rational(y) & Q.integer(2*y)) is None
 
     # logarithm
     assert ask(Q.imaginary(log(I))) is True
@@ -1482,6 +1483,10 @@ def test_imaginary():
     assert ask(Q.imaginary(exp(3*I*pi*x)**x), Q.integer(x)) is False
     assert ask(Q.imaginary(exp(2*pi*I, evaluate=False))) is False
     assert ask(Q.imaginary(exp(pi*I/2, evaluate=False))) is True
+
+    # issue 7886
+    assert ask(Q.imaginary(Pow(x, S.One/4)), Q.real(x) & Q.negative(x)) is False
+
 
 def test_infinitesimal():
     assert ask(Q.infinitesimal(x)) is None
@@ -1907,6 +1912,9 @@ def test_algebraic():
 
     assert ask(Q.algebraic(2.47)) is True
 
+    assert ask(Q.algebraic(x), Q.transcendental(x)) is False
+    assert ask(Q.transcendental(x), Q.algebraic(x)) is False
+
 
 def test_global():
     """Test ask with global assumptions"""
@@ -2061,7 +2069,7 @@ def test_positive_assuming():
         assert not ask(Q.positive(x))
 
 
-def test_issue_2322():
+def test_issue_5421():
     raises(TypeError, lambda: ask(pi/log(x), Q.real))
 
 
@@ -2069,11 +2077,41 @@ def test_issue_3906():
     raises(TypeError, lambda: ask(Q.positive))
 
 
-def test_issue_2734():
+def test_issue_5833():
     assert ask(Q.positive(log(x)**2), Q.positive(x)) is None
     assert ask(~Q.negative(log(x)**2), Q.positive(x)) is True
 
 
-def test_issue_3633():
+def test_issue_6732():
     raises(ValueError, lambda: ask(Q.positive(x), Q.positive(x) & Q.negative(x)))
     raises(ValueError, lambda: ask(Q.negative(x), Q.positive(x) & Q.negative(x)))
+
+
+def test_issue_7246():
+    assert ask(Q.positive(atan(p)), Q.positive(p)) is True
+    assert ask(Q.positive(atan(p)), Q.negative(p)) is False
+    assert ask(Q.positive(atan(p)), Q.zero(p)) is False
+    assert ask(Q.positive(atan(x))) is None
+
+    assert ask(Q.positive(asin(p)), Q.positive(p)) is None
+    assert ask(Q.positive(asin(p)), Q.zero(p)) is None
+    assert ask(Q.positive(asin(Rational(1, 7)))) is True
+    assert ask(Q.positive(asin(x)), Q.positive(x) & Q.nonpositive(x - 1)) is True
+    assert ask(Q.positive(asin(x)), Q.negative(x) & Q.nonnegative(x + 1)) is False
+
+    assert ask(Q.positive(acos(p)), Q.positive(p)) is None
+    assert ask(Q.positive(acos(Rational(1, 7)))) is True
+    assert ask(Q.positive(acos(x)), Q.nonnegative(x + 1) & Q.nonpositive(x - 1)) is True
+    assert ask(Q.positive(acos(x)), Q.nonnegative(x - 1)) is None
+
+    assert ask(Q.positive(acot(x)), Q.positive(x)) is True
+    assert ask(Q.positive(acot(x)), Q.real(x)) is True
+    assert ask(Q.positive(acot(x)), Q.imaginary(x)) is False
+    assert ask(Q.positive(acot(x))) is None
+
+
+@XFAIL
+def test_issue_7246_failing():
+    #Move this test to test_issue_7246 once
+    #the new assumptions module is improved.
+    assert ask(Q.positive(acos(x)), Q.zero(x)) is True

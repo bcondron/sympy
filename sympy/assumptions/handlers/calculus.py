@@ -79,7 +79,8 @@ class AskBoundedHandler(CommonHandler):
         """
         Handles Symbol.
 
-        Examples:
+        Examples
+        ========
 
         >>> from sympy import Symbol, Q
         >>> from sympy.assumptions.handlers.calculus import AskBoundedHandler
@@ -161,7 +162,7 @@ class AskBoundedHandler(CommonHandler):
 
         """
 
-        sign = -1  # sign of unknown or unbounded
+        sign = -1  # sign of unknown or infinite
         result = True
         for arg in expr.args:
             _bounded = ask(Q.bounded(arg), assumptions)
@@ -254,11 +255,11 @@ class AskBoundedHandler(CommonHandler):
             return False
         if base_bounded and exp_bounded:
             return True
-        if (abs(expr.base) <= 1) is True and ask(Q.positive(expr.exp), assumptions):
+        if (abs(expr.base) <= 1) == True and ask(Q.positive(expr.exp), assumptions):
             return True
-        if (abs(expr.base) >= 1) is True and ask(Q.negative(expr.exp), assumptions):
+        if (abs(expr.base) >= 1) == True and ask(Q.negative(expr.exp), assumptions):
             return True
-        if (abs(expr.base) >= 1) is True and exp_bounded is False:
+        if (abs(expr.base) >= 1) == True and exp_bounded is False:
             return False
         return None
 

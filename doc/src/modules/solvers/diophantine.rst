@@ -84,7 +84,7 @@ First, let's import the highest API of the Diophantine module.
 Before we start solving the equations, we need to define the variables.
 
 >>> from sympy import symbols
->>> x, y, z = symbols("x, y, z", Integer=True)
+>>> x, y, z = symbols("x, y, z", integer=True)
 
 Let's start by solving the easiest type of Diophantine equations, i.e. linear
 Diophantine equations. Let's solve `2x + 3y = 5`. Note that although we
@@ -127,11 +127,11 @@ Note that except for the highest level API, in case of no solutions, a tuple of
 Also, one can specifically set the parameter to be used in the solutions by
 passing a customized parameter. Consider the following example.
 
->>> m = symbols("m", Integer=True)
+>>> m = symbols("m", integer=True)
 >>> diop_solve(2*x + 3*y - 5, m)
 (3*m - 5, -2*m + 5)
 
-Please note that for the moment, user can set the parameter only for linear 
+Please note that for the moment, user can set the parameter only for linear
 Diophantine equations and binary quadratic equations.
 
 Let's try solving a binary quadratic equation which is an equation with two
@@ -164,14 +164,17 @@ solutions. Consider the below cases where `\Delta = 8`.
 
 >>> diophantine(x**2 - 4*x*y + 2*y**2 - 3*x + 7*y - 5)
 set()
->>> from sympy import expand
->>> n = symbols("n", Integer=True)
+>>> from sympy import sqrt
+>>> n = symbols("n", integer=True)
 >>> s = diophantine(x**2 -  2*y**2 - 2*x - 4*y, n)
->>> x_n, y_n = s.pop()
->>> expand(x_n)
--(-2*sqrt(2) + 3)**n/2 + sqrt(2)*(-2*sqrt(2) + 3)**n/2 - sqrt(2)*(2*sqrt(2) + 3)**n/2 - (2*sqrt(2) + 3)**n/2 + 1
->>> expand(y_n)
--sqrt(2)*(-2*sqrt(2) + 3)**n/4 + (-2*sqrt(2) + 3)**n/2 + sqrt(2)*(2*sqrt(2) + 3)**n/4 + (2*sqrt(2) + 3)**n/2 - 1
+>>> x_1, y_1 = s.pop()
+>>> x_2, y_2 = s.pop()
+>>> x_n = -(-2*sqrt(2) + 3)**n/2 + sqrt(2)*(-2*sqrt(2) + 3)**n/2 - sqrt(2)*(2*sqrt(2) + 3)**n/2 - (2*sqrt(2) + 3)**n/2 + 1
+>>> x_1 == x_n or x_2 == x_n
+True
+>>> y_n = -sqrt(2)*(-2*sqrt(2) + 3)**n/4 + (-2*sqrt(2) + 3)**n/2 + sqrt(2)*(2*sqrt(2) + 3)**n/4 + (2*sqrt(2) + 3)**n/2 - 1
+>>> y_1 == y_n or y_2 == y_n
+True
 
 Here `n` is an integer. Although x_n and y_n may not look like
 integers, substituting in specific values for n (and simplifying) shows that they

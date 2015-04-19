@@ -1,7 +1,8 @@
 from __future__ import print_function, division
 
-from sympy.core import Basic, Tuple, FiniteSet
-from sympy.core.compatibility import as_int
+from sympy.core import Basic, Tuple
+from sympy.sets import FiniteSet
+from sympy.core.compatibility import as_int, range
 from sympy.combinatorics import Permutation as Perm
 from sympy.combinatorics.perm_groups import PermutationGroup
 from sympy.utilities.iterables import (minlex, unflatten, flatten)
@@ -65,7 +66,7 @@ class Polyhedron(Basic):
         Here we construct the Polyhedron object for a tetrahedron.
 
         >>> corners = [w, x, y, z]
-        >>> faces = [(0,1,2), (0,2,3), (0,3,1), (1,2,3)]
+        >>> faces = [(0, 1, 2), (0, 2, 3), (0, 3, 1), (1, 2, 3)]
 
         Next, allowed transformations of the polyhedron must be given. This
         is given as permutations of vertices.
@@ -77,13 +78,13 @@ class Polyhedron(Basic):
         permutation, Permutation(range(4)), is not included since it does
         not change the orientation of the vertices.)
 
-        >>> pgroup = [Permutation([[0,1,2], [3]]), \
-                      Permutation([[0,1,3], [2]]), \
-                      Permutation([[0,2,3], [1]]), \
-                      Permutation([[1,2,3], [0]]), \
-                      Permutation([[0,1], [2,3]]), \
-                      Permutation([[0,2], [1,3]]), \
-                      Permutation([[0,3], [1,2]])]
+        >>> pgroup = [Permutation([[0, 1, 2], [3]]), \
+                      Permutation([[0, 1, 3], [2]]), \
+                      Permutation([[0, 2, 3], [1]]), \
+                      Permutation([[1, 2, 3], [0]]), \
+                      Permutation([[0, 1], [2, 3]]), \
+                      Permutation([[0, 2], [1, 3]]), \
+                      Permutation([[0, 3], [1, 2]])]
 
         The Polyhedron is now constructed and demonstrated:
 
@@ -293,7 +294,7 @@ class Polyhedron(Basic):
 
             4 faces:
 
-            (0,1,2) (0,2,3) (0,3,1) (1,2,3)
+            (0, 1, 2) (0, 2, 3) (0, 3, 1) (1, 2, 3)
 
         cube, cube_faces
         ----------------
@@ -305,9 +306,9 @@ class Polyhedron(Basic):
 
             6 faces:
 
-            (0,1,2,3)
-            (0,1,5,4) (1,2,6,5) (2,3,7,6) (0,3,7,4)
-            (4,5,6,7)
+            (0, 1, 2, 3)
+            (0, 1, 5, 4) (1, 2, 6, 5) (2, 3, 7, 6) (0, 3, 7, 4)
+            (4, 5, 6, 7)
 
         octahedron, octahedron_faces
         ----------------------------
@@ -320,8 +321,8 @@ class Polyhedron(Basic):
 
             8 faces:
 
-            (0,1,2) (0,2,3) (0,3,4) (0,1,4)
-            (1,2,5) (2,3,5) (3,4,5) (1,4,5)
+            (0, 1, 2) (0, 2, 3) (0, 3, 4) (0, 1, 4)
+            (1, 2, 5) (2, 3, 5) (3, 4, 5) (1, 4, 5)
 
         dodecahedron, dodecahedron_faces
         --------------------------------
@@ -335,11 +336,10 @@ class Polyhedron(Basic):
 
             12 faces:
 
-            (0,1,2,3,4)
-            (0,1,6,10,5) (1,2,7,11,6) (2,3,8,12,7) (3,4,9,13,8) (0,4,9,14,5)
-            (5,10,16,15,14) (
-                6,10,16,17,11) (7,11,17,18,12) (8,12,18,19,13) (9,13,19,15,14)
-            (15,16,17,18,19)
+            (0, 1, 2, 3, 4) (0, 1, 6, 10, 5) (1, 2, 7, 11, 6)
+            (2, 3, 8, 12, 7) (3, 4, 9, 13, 8) (0, 4, 9, 14, 5)
+            (5, 10, 16, 15, 14) (6, 10, 16, 17, 11) (7, 11, 17, 18, 12)
+            (8, 12, 18, 19, 13) (9, 13, 19, 15, 14)(15, 16, 17, 18, 19)
 
         icosahedron, icosahedron_faces
         ------------------------------
@@ -356,7 +356,8 @@ class Polyhedron(Basic):
             (0,1,2) (0,2,3) (0,3,4) (0,4,5) (0,1,5)
             (1,2,6) (2,3,7) (3,4,8) (4,5,9) (1,5,10)
             (2,6,7) (3,7,8) (4,8,9) (5,9,10) (1,6,10)
-            (6,7,11,) (7,8,11) (8,9,11) (9,10,11) (6,10,11)
+            (6,7,11,) (7,8,11) (8,9,11) (9,10,11)
+            (6,10,11)
 
         >>> from sympy.combinatorics.polyhedron import cube
         >>> cube.edges
@@ -380,7 +381,7 @@ class Polyhedron(Basic):
             [Tuple(*a) for a in (corners, faces, pgroup)]
         obj = Basic.__new__(cls, *args)
         obj._corners = tuple(corners)  # in order given
-        obj._faces = FiniteSet(faces)
+        obj._faces = FiniteSet(*faces)
         if pgroup and pgroup[0].size != len(corners):
             raise ValueError("Permutation size unequal to number of corners.")
         # use the identity permutation if none are given
